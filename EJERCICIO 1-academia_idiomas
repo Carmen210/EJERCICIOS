@@ -1,0 +1,57 @@
+CREAR BASE DE DATOS: ACADEMIA
+2 TABLAS: ALUMNOS E IDIOMAS
+ ALUMNOS: id_alumno, nombre, apellido, dni
+ IDIOMA: id_idioma, nombre_idioma y nivel (basico, intermedio, avanzado)
+    CONDICIONES: CADA ALUMNO 1 SOLO IDIOMA. VARIOS ALUMUNOS PUEDEN ESTUDIAR EL MISMO IDIOMA.
+
+ CREO TABLAS Y PK + FK
+
+-- CARGO DATOS EN IDIOMAS
+INSERT INTO idiomas(id_idioma, nombre_idioma, nivel) VALUES 
+(1,'Ingles', 'Intermedio'),
+(2, 'Frances', 'Basico'),
+(3, 'Alemán', 'Avanzado'),
+(4,'Ucraniano', 'Basico');
+
+-- CARGO DATOS ALUMNOS
+INSERT INTO alumnos (id_alumno, nombre, apellido, dni, id_idioma) VALUES
+(1, 'Lucas', 'Giménez', 30123456, 1),
+(2, 'Sofía', 'Pereyra', 31234567, 2),
+(3, 'Mateo', 'Rodríguez', 32345678, 3),
+(4, 'Emilia', 'Castro', 33456789, 1),
+(5, 'Benjamín', 'Luna', 34567890, 4),
+(6, 'Abril', 'Rojas', 35678901, 3),
+(7, 'Valentín', 'Silva', 36789012, 1),
+(8, 'Julieta', 'Acosta', 37890123, 2),
+(9, 'Fausto', 'Moretti', 38901234, 3),
+(10, 'Olivia', 'Ortiz', 39012345, 1);
+
+--CONSULTA 1: OBTENER LISTA COMPLETA DE TODOS LOS ALUMOS -- LECTURA
+SELECT *
+FROM alumnos
+
+-- CONSULTA 2: OBTENER LA LISTA COMPLETA DE LOS IDIOMAS -- LECTURA
+SELECT * 
+FROM idiomas
+
+-- CONSULTA 3: OBTENER LISTA ALUMNOS DE UN IDIOMA DETERMINADO
+  -- forma A 
+      SELECT * 
+      FROM alumnos
+      WHERE id_idioma = 2
+  -- forma B
+      SELECT *
+      FROM alumnos
+      JOIN idiomas ON alumnos.id_idioma = idiomas.id_idioma
+      WHERE idiomas.nombre_idioma = 'Frances';
+  -- forma c -- JOIN IMPLICITO
+      SELECT *
+      FROM alumnos, idiomas
+      WHERE alumnos.id_idioma = idiomas.id_idioma
+      AND idiomas.nombre_idioma = 'Frances';
+  
+-- CONSULTA 4: OBTENER LA CANTIDAD DE ALUMNOS QUE ESTUDIAN 1 IDIOMA PARTICULAR
+    SELECT COUNT(*) AS cant_alumnos_ingles
+    FROM alumnos
+    JOIN idiomas ON alumnos.id_idioma = idiomas.id_idioma
+    WHERE idiomas.nombre_idioma = 'ingles';
