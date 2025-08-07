@@ -1,0 +1,129 @@
+-- UN CLUB NECESITA UNA BD PARA GESTIONAR UN TORNEO DE FUTBOL 5.
+-- SE DEBEN ALMACENAR DATOS DE LOS JUGADORES, LAS CATEGORIAS (POR EDAD Y GENERO), Y LAS INSCIPCIONES AL TORNEO ACLARANDO SI EL JUGADOR PAGÓ LA INSCRIPCION
+-- TABLAS
+          PARTICIPANTES: dni_participante PK, apellido, nombre, direccion, edad, telefono, genero
+          CATEGORIAS: id_categoria PK, nombre, edad_min, edad_max, genero
+          INSCRIPCIONES: num_inscripcion PK, fecha_insc, abono_insc
+--CATEGORIAS por edad
+            femenino a (18 a 30)
+            femenino b (31 a 45)
+            femenino senior (46 a 60)
+            masculino a (18 a 30)
+            masculino b (31 a 45)
+            masculino senior (46 a 60)
+
+--RELACIONES 
+            1:1 - 1 PARTICIPANTE SOLO PUEDE INSCRIBIRSE EN 1 CATEGORIA
+            1:1 - 1 INSCRIPCION CORRESPONDE SOLO A 1 PARTICIPANTE
+            1:1 - 1 INSCRIPCION TIENE 1 CATEGORIA
+            1:N - 1 CATEGORIA PUEDE TENER MUCHAS INSCRIPCIONES
+--FK - SIEMPRE DEL LADO N. ACA LA FK EN INSCRIPCIONES
+
+--CREO BD torneo_futbol5
+--CREO TABLAS CON SU PK   PARTICIPANTES: dni_participante PK, apellido, nombre, dni, direccion, edad, telefono, genero
+                          CATEGORIAS: id_categoria PK, nombre, edad_min, edad_max, genero
+                          INSCRIPCIONES: num_inscripcion PK, fecha_insc, abono_insc
+
+--CARGO DATOS
+--CATEGORIAS   
+INSERT INTO categorias VALUES
+(1,'Femenino A', 18, 30,'F'),
+(2,'Femenino B', 31, 45,'F'),
+(3,'Femenino senior', 46, 60,'F'),
+(4,'Masculino A', 18, 30,'M'),
+(5,'Masculino B', 31, 45,'M'),
+(6,'Masculino senior', 46, 60,'M');
+
+--PARTICIPANTES
+INSERT INTO participantes (id_participante, apellido, nombre, dni, direccion, edad, telefono, sexo) VALUES
+(1, 'Fernández', 'Ana', 12345678, 'Calle Falsa 123', 28, '1122334455', 'F'),
+(2, 'Gómez', 'Luis', 23456789, 'Av. Siempre Viva 742', 35, '1133445566', 'M'),
+(3, 'Pérez', 'Marta', 34567890, 'Sol 456', 42, '1144556677', 'F'),
+(4, 'Rodríguez', 'Juan', 45678901, 'Luna 789', 50, '1155667788', 'M'),
+(5, 'López', 'Sofía', 56789012, 'Estrella 101', 22, '1166778899', 'F'),
+(6, 'Martínez', 'Pedro', 67890123, 'Camino Real 202', 60, '1177889900', 'M'),
+(7, 'Díaz', 'Elena', 78901234, 'Diagonal Norte 303', 31, '1188990011', 'F'),
+(8, 'Sánchez', 'Pablo', 89012345, 'Ruta Sur 404', 45, '1199001122', 'M');
+
+--INSCRIPCIONES
+INSERT INTO inscripciones (num_inscripcion, fecha_insc, abono_inscrip, id_participante, id_categoria) VALUES
+(1, '2025-08-01', TRUE, 1, 1),
+(2, '2025-08-02', FALSE, 2, 2),
+(3, '2025-08-02', TRUE, 3, 3),
+(4, '2025-08-02', TRUE, 4, 4),
+(5, '2025-08-04', FALSE, 5, 5),
+(6, '2025-08-03', TRUE, 6, 6),
+(7, '2025-08-04', TRUE, 7, 1),
+(8, '2025-08-04', FALSE, 8, 2);
+
+--CONSULTA 1: CONTAR CANTIDAD TOTAL DE PARTICIPANTES
+SELECT COUNT(*) AS total_participantes
+FROM participantes;
+
+--CONSULTA 2: OBTENER LISTA COMPLETA DE PARTICIPANTES
+SELECT *
+FROM participantes
+
+--CONSULTA 3: OBTENER LISTA COMPLETA DE CATEGORIAS
+SELECT *
+FROM categorias
+
+--CONSULTA 4: OBTENER LA CANTIDAD TOTAL DE PARTICIPANTES MUJERES.
+SELECT COUNT(*) AS mujeres_participantes
+FROM participantes
+WHERE sexo = 'F';
+
+--CONSULTA 5: OBTENER NOMBRE Y APELLIDO DE LOS INSCRIPTOS EN CATEGORIA MASCULINO B
+--ACA HAY Q UNIR DATOS DE LAS 3 TABLAS
+SELECT p.nombre, p.apellido
+FROM participantes p
+JOIN inscripciones i ON p.id_participante = i.id_participante
+JOIN categorias c ON i.id_categoria = c.id_categoria
+WHERE c.nombre = 'Masculino B';
+
+--CONSULTA 6: OBTENER LOS DATOS DE PARTICIPANTES DE AMBOS GENEROS CUYA EDAD ESTÉ ENTRE 20 Y 35 AÑOS.
+  --OPCION 1:
+SELECT * 
+FROM participantes
+WHERE edad >=20 AND edad <=35;
+
+    --OPCION 2:
+SELECT * 
+FROM participantes
+WHERE edad BETWEEN 20 AND 35;
+
+--CONSULTA 7: OBTENER LISTA COMPLETA DE INSCRIPCIONES CON NOMBRE Y APELLIDO DE C/U- SIN DIFERENCIAR CATEGORIA
+SELECT inscripciones.*, participantes.nombre, participantes.apellido -- TODO DE INSCRIPCIONES Y SOLO NOMBRE Y APELLIDO DE PARTICIPANTES
+FROM inscripciones  
+JOIN participantes ON inscripciones.id_participante = participantes.id_participante;
+
+--CONSULTA 8: OBTENER NOMBRE Y APELLIDO DEL PARTICIPANTE MAS JOVEN
+  --opcion 1:
+SELECT nombre, apellido
+FROM participantes
+JOIN inscripciones ON abono_inscrip = TRUE
+ORDER BY edad ASC
+LIMIT 1;
+
+  --opcion 2: con SUBCONSULTA
+SELECT nombre, apellido
+FROM participantes
+WHERE edad = (
+    SELECT MIN(edad)
+    FROM participantes
+    WHERE id_participante IN (
+        SELECT id_participante FROM inscripciones
+        )
+);
+
+--CONSULTA 9: OBTENER  EL NOMBRE DE LA CATEGORIA CON MAS INSCRIPTOS// con SUBCONSULTA
+SELECT nombre
+FROM categorias
+WHERE id_categoria = (
+		SELECT id_categoria
+		FROM inscripciones
+		GROUP BY id_categoria
+    	ORDER BY COUNT(*) DESC	
+    	LIMIT 1
+);
+ 
