@@ -1,0 +1,71 @@
+--CREAR BD "LIBRERIA"
+--TABLAS: LIBROS (codigo, titulo, precio) Y EDITORIALES (codigo, nombre, pais_origen)
+--CADA LIBRO PERTENECE A 1SOLA EDITORIAL.
+--VARIOS LIBROS PERTENECEN A LA MISMA EDITORIAL.
+--RELACIONES   
+            -- 1:1 - CADA LIBRO PERTENECE A 1SOLA EDITORIAL.
+            -- 1:N - VARIOS LIBROS PERTENECEN A LA MISMA EDITORIAL. LA N ESTÁ EN LIBROS = FK . 
+--CREO LA BASE
+CREATE DATABASE  libreria
+
+--CREO TABLA EDITORIALES < LA CREO PRIMERO XQ NO TIENE FK Y DEBE EXISTIR PRIMERO PARA RELACIONARLA A LIBROS
+CREATE TABLE editoriales (
+	codigo INT PRIMARY KEY,
+    nombre VARCHAR (100),
+    pais_origen VARCHAR (50) NOT NULL
+);
+
+--CREO TABLA LIBROS Y ESPECIFICO LA FK
+CREATE TABLE libros(
+codigo INT PRIMARY KEY,
+titulo VARCHAR (150) NOT NULL,
+precio DOUBLE,
+codigo_editorial INT, 
+FOREIGN KEY (codigo_editorial) REFERENCES editoriales(codigo)    
+);
+
+--INSERTO DATOS EN ""EDITORIALES"
+INSERT INTO editoriales (codigo, nombre, pais_origen) VALUES
+(1, 'Bloomsbury', 'Reino Unido'),
+(2, 'SM Ediciones', 'Argentina'),
+(3, 'Alfaguara', 'España');
+
+--INSERTO DATOS EN "LIBROS"
+INSERT INTO libros (codigo, titulo, precio, codigo_editorial) VALUES
+(101, 'Harry Potter y la piedra filosofal', 25000.50, 1),
+(102, 'El señor de los anillos: La comunidad del anillo', 30000.00, 1),
+(103, 'El principito', 15000.75, 2),
+(104, 'La historia interminable', 22000.99, 2),
+(105, 'Cien años de soledad', 28000.50, 3),
+(106, 'El amor en los tiempos del cólera', 24000.00, 3),
+(107, 'Fahrenheit 451', 19000.99, 1),
+(108, 'El diario de Ana Frank', 18000.25, 2),
+(109, 'Rebelión en la granja', 16000.50, 3),
+(110, 'Crónica de una muerte anunciada', 21000.75, 3);
+
+--CONSULTA 1: LISTA COMPLETA DE LIBROS ORDENADOS POR PRECIO DE + A -
+SELECT * 
+FROM libros	
+ORDER BY precio ASC;
+
+--CONSULTA 2: LISTA DE EDITORIALES ORDENADAS ALFABETICAMENTE
+SELECT * 
+FROM editoriales
+ORDER BY nombre ASC;
+
+--CONSULTA 3: OBTENER TITULO Y PRECIO DE LIBROS CON PRECIO MAYOR A 20MIL
+SELECT titulo, precio 
+FROM libros
+WHERE precio > 20000;
+
+--CONSULTA 4: OBTENER TITULO Y PRECIO DEL LIBRO MAS BARATO
+SELECT titulo, precio 
+FROM libros
+ORDER BY precio ASC
+LIMIT 1;
+
+--Y EL MAS CARO?
+SELECT titulo, precio 
+FROM libros
+ORDER BY precio DESC
+LIMIT 1;
